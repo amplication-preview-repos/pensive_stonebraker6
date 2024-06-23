@@ -1,0 +1,77 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Car {
+  auctions   Auction[]
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  imageUrl   String?
+  make       String?
+  model      String?
+  startPrice Float?
+  updatedAt  DateTime  @updatedAt
+  year       Int?
+}
+
+model Admin {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  role      String?
+  updatedAt DateTime @updatedAt
+}
+
+model Bid {
+  amount    Float?
+  auction   Auction? @relation(fields: [auctionId], references: [id])
+  auctionId String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    String?
+}
+
+model Auction {
+  bids       Bid[]
+  car        Car?      @relation(fields: [carId], references: [id])
+  carId      String?
+  createdAt  DateTime  @default(now())
+  currentBid Float?
+  endTime    DateTime?
+  entryFee   Float?
+  id         String    @id @default(cuid())
+  startTime  DateTime?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Profession {
+  createdAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  initialCredit Int?
+  isReserved    Boolean?
+  name          String?
+  updatedAt     DateTime @updatedAt
+  users         User[]
+}
+
+model User {
+  bids         Bid[]
+  createdAt    DateTime    @default(now())
+  email        String?     @unique
+  firstName    String?
+  id           String      @id @default(cuid())
+  lastName     String?
+  password     String
+  profession   Profession? @relation(fields: [professionId], references: [id])
+  professionId String?
+  roles        Json
+  updatedAt    DateTime    @updatedAt
+  username     String      @unique
+  wallet       Int?
+}
